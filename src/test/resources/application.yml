@@ -1,0 +1,22 @@
+application:
+  username: ${ADMIN_USERNAME}
+  password: ${ADMIN_PASSWORD}}
+
+spring:
+  profiles:
+    active: dev
+
+  application:
+    name: runtracer-backend
+
+  server:
+    port: 8888
+
+  logging:
+    level:
+      root: DEBUG
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:mariadb://localhost:3306/db_name}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}

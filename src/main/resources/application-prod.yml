@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: runtracer-backend-prod
+
+    logging:
+    level:
+      web: INFO
+
+  server:
+    port: ${SERVER_PORT}
+
+  r2dbc:
+    url: r2dbc:mariadb://localhost:3306/${DATABASE_NAME}
+
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}

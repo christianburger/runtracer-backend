@@ -1,10 +1,21 @@
+version: "3.8"
+
 services:
   mariadb:
-    image: 'mariadb:latest'
+    image: mariadb:latest
     environment:
-      - 'MARIADB_DATABASE=mydatabase'
-      - 'MARIADB_PASSWORD=secret'
-      - 'MARIADB_ROOT_PASSWORD=verysecret'
-      - 'MARIADB_USER=myuser'
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}  # Use the DATABASE_PASSWORD environment variable
+      MYSQL_DATABASE: ${DATABASE_NAME}  # Use the DATABASE_NAME environment variable
+    volumes:
+      - ${MARIADB_VOLUME_PATH}:/var/lib/mysql  # Use the MARIADB_VOLUME_PATH environment variable
     ports:
-      - '3306'
+      - "3306:3306"  # Map container port 3306 to host port 3306
+
+  h2:
+    image: oscarfonts/h2
+    volumes:
+      - ${H2_VOLUME_PATH}:/h2-data  # Use the H2_VOLUME_PATH environment variable
+    ports:
+      - "9092:9092"
+    environment:
+      H2_OPTIONS: -ifNotExists -web -webAllowOthers -tcp -tcpAllowOthers
