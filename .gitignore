@@ -35,3 +35,8 @@ build/
 .mvn/
 mvnw
 mvnw.cmd
+
+### Local Environment Variables
+
+setenv.sh
+
