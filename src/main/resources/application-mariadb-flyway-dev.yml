@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: mariadb-flyway-dev
+
+  logging:
+    level:
+      root: DEBUG
+      flyway: DEBUG
+      org.flywaydb: DEBUG
+
+  flyway:
+    locations: classpath:db/migration
+    enabled: true
+    url: jdbc:mariadb://localhost:3306/${DATABASE_NAME}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}

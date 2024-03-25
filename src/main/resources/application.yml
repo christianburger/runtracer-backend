@@ -1,0 +1,36 @@
+application:
+  username: ${ADMIN_USERNAME}
+  password: ${ADMIN_PASSWORD}
+
+spring:
+  profiles:
+    active: mariadb-flyway-dev
+
+  application:
+    name: runtracer-backend
+
+  server:
+    port: ${SERVER_PORT}
+
+  logging:
+    level:
+      root: DEBUG
+      flyway: DEBUG
+
+  r2dbc:
+    url: r2dbc:mariadb://localhost:3306/${DATABASE_NAME}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${google_default_client_id}
+            client-secret: ${google_default_client_secret}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - openid
+              - profile
+              - email
