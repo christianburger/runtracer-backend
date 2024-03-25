@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: runtracer-backend-dev
+
+  server:
+    port: ${SERVER_PORT}
+
+  logging:
+  level:
+    org.springframework.boot: DEBUG
+    root: DEBUG
+
+  r2dbc:
+    url: r2dbc:mariadb://localhost:3306/${DATABASE_NAME}
+
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
