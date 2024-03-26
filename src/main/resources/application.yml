@@ -1,6 +1,8 @@
 application:
-  username: ${ADMIN_USERNAME}
-  password: ${ADMIN_PASSWORD}
+  admin:
+    username: ${ADMIN_USERNAME}
+    password: ${ADMIN_PASSWORD}
+    email: ${ADMIN_EMAIL}
 
 spring:
   profiles:
@@ -8,6 +10,7 @@ spring:
 
   application:
     name: runtracer-backend
+    version: 1.0.0
 
   server:
     port: ${SERVER_PORT}
@@ -16,21 +19,25 @@ spring:
     level:
       root: DEBUG
       flyway: DEBUG
+      org.springdoc: DEBUG
+      io.swagger.v3: DEBUG
+      org.springframework: DEBUG
 
   r2dbc:
     url: r2dbc:mariadb://localhost:3306/${DATABASE_NAME}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
 
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${google_default_client_id}
-            client-secret: ${google_default_client_secret}
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope:
-              - openid
-              - profile
-              - email
+security:
+  oauth2:
+    client:
+      registration:
+        google:
+          client-id: ${google_runtracer_client_id}
+          client-secret: ${google_runtracer_client_secret}
+          client-api-key: ${google_runtracer_api_key} # Add this line
+          redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          scope:
+            - openid
+            - profile
+            - email

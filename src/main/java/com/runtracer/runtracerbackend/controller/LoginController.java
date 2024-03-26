@@ -1,5 +1,8 @@
 package com.runtracer.runtracerbackend.controller;
 
+import com.runtracer.runtracerbackend.exceptions.InvalidCredentialsException;
+import com.runtracer.runtracerbackend.exceptions.UserNotFoundException;
+import com.runtracer.runtracerbackend.repository.ReactiveOAuth2ClientRegistrationRepository;
 import com.runtracer.runtracerbackend.service.UserService;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,19 +12,25 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.config.EnableWebFlux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
+@EnableWebFlux
+@RestController
 public class LoginController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final ReactiveOAuth2ClientRegistrationRepository clientRegistrationRepository;
 
     @Autowired
-    public LoginController(UserService userService, PasswordEncoder passwordEncoder) {
+    public LoginController(UserService userService, PasswordEncoder passwordEncoder, ReactiveOAuth2ClientRegistrationRepository clientRegistrationRepository) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @PostMapping("/login")
@@ -29,24 +38,24 @@ public class LoginController {
         log.info("Login attempt for username: {}", loginForm.getUsername());
 
         return userService.findByUsername(loginForm.getUsername())
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.error("User not found for username: {}", loginForm.getUsername());
+                    throw new UserNotFoundException();
+                }))
                 .flatMap(user -> {
-                    if (user == null) {
-                        log.error("User not found for username: {}", loginForm.getUsername());
-                        return Mono.error(new RuntimeException("User not found"));
-                    }
-
-                    // Compare encoded passwords
                     boolean passwordMatches = passwordEncoder.matches(loginForm.getPassword(), user.getPassword());
                     log.info("Password matches for username: {}: {}", loginForm.getUsername(), passwordMatches);
 
-                    return passwordMatches ? Mono.just("Login successful") : Mono.error(new RuntimeException("Invalid credentials"));
+                    if (!passwordMatches) {
+                        throw new InvalidCredentialsException();
+                    }
+                    return Mono.just("Login successful");
                 });
     }
 
     @Setter
     @Getter
-    static class LoginForm {
-        // Getters and setters
+    public static class LoginForm {
         private String username;
         private String password;
     }

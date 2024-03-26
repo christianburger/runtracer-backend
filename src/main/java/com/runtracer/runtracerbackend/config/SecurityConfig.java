@@ -9,10 +9,9 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
@@ -23,25 +22,18 @@ import org.springframework.security.web.server.context.WebSessionServerSecurityC
 @Slf4j
 public class SecurityConfig {
 
-    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
-    @Value("${application.username}")
+    @Value("${application.admin.username}")
     private String adminUsername;
 
-    @Value("${application.password}")
+    @Value("${application.admin.password}")
     private String adminPassword;
 
-    public SecurityConfig(PasswordEncoder passwordEncoder, UserService userService) {
-        this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
-        log.info("SecurityConfig initialized with PasswordEncoder: {}", passwordEncoder);
-    }
+    @Value("${application.admin.email}")
+    private String adminEmail;
 
-    @Bean
-    public UserDetailsRepositoryReactiveAuthenticationManager authenticationManager(ReactiveUserDetailsService userDetailsService) {
-        UserDetailsRepositoryReactiveAuthenticationManager authenticationManager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-        authenticationManager.setPasswordEncoder(passwordEncoder);
-        return authenticationManager;
+    public SecurityConfig(UserService userService) {
+        this.userService = userService;
     }
 
     @Bean
@@ -49,14 +41,18 @@ public class SecurityConfig {
         log.info("Creating ServerSecurityContextRepository bean");
         return new WebSessionServerSecurityContextRepository();
     }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @EventListener(ApplicationReadyEvent.class)
     public void insertAdminUser() {
         log.info("Application is ready, inserting admin user");
         User admin = new User();
         admin.setUsername(adminUsername);
-        admin.setPassword(passwordEncoder.encode(adminPassword));
-        admin.setEmail("admin@example.com"); // replace with actual email
+        admin.setPassword(this.passwordEncoder().encode(adminPassword));
+        admin.setEmail(adminEmail);
         userService.save(admin)
                 .subscribe(user -> log.info("Admin user checked"),
                         error -> log.error("Error inserting admin user: {}", error.getMessage()));

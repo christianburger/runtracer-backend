@@ -25,7 +25,7 @@ import java.sql.SQLException;
 @Configuration
 @Slf4j
 @Profile("mariadb-flyway-dev")
-public class SynchronousDatabaseConfig implements DatabaseConfigStrategy {
+public class SynchronousDatabaseConfig {
 
 
     @Value("${spring.r2dbc.url}")
@@ -40,11 +40,15 @@ public class SynchronousDatabaseConfig implements DatabaseConfigStrategy {
     @Value("${spring.flyway.password}")
     private String password;
 
+    @Value("${server.port}")
+    private String serverPort;
+
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     @Bean
     public DataSource dataSource() {
+        log.info("DataSource datasource: serverPort: {}", serverPort);
         log.info("Creating DataSource with URL: {}, username: {}, password: {}", flywayUrl, username, password);
         MariaDbDataSource dataSource = DataSourceBuilder.create().type(MariaDbDataSource.class).url(flywayUrl).username(username).password(password).build();
 
@@ -66,6 +70,7 @@ public class SynchronousDatabaseConfig implements DatabaseConfigStrategy {
         Flyway flyway = Flyway.configure().dataSource(dataSource).load();
 
         log.info("Flyway configured: {}", flyway);
+        log.info("Flyway configured: Info: {}", flyway.info());
         flyway.info();
         flyway.migrate();
         flyway.getConfiguration();
