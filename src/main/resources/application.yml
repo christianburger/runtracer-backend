@@ -1,16 +1,22 @@
 application:
+  name: runtracer-backend
+  description: "Runtracer Backend API"
+  version: 1.0.0
+
   admin:
     username: ${ADMIN_USERNAME}
     password: ${ADMIN_PASSWORD}
     email: ${ADMIN_EMAIL}
 
 spring:
+  webflux:
+    base-path: /
+  web:
+    resources:
+      add-mappings: false
+
   profiles:
     active: mariadb-flyway-dev
-
-  application:
-    name: runtracer-backend
-    version: 1.0.0
 
   server:
     port: ${SERVER_PORT}
@@ -22,6 +28,8 @@ spring:
       org.springdoc: DEBUG
       io.swagger.v3: DEBUG
       org.springframework: DEBUG
+      org.springframework.beans: DEBUG
+      org.springframework.context: DEBUG
 
   r2dbc:
     url: r2dbc:mariadb://localhost:3306/${DATABASE_NAME}
@@ -41,3 +49,20 @@ security:
             - openid
             - profile
             - email
+
+springdoc:
+  packagesToScan: com.runtracer.runtracerbackend.controller
+  show-actuator: true
+  version: 1.8
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui/index.html
+#    config-url:  /swagger-ui/index.html
+
+
+  #Open Api 3.0
+  #springdoc.swagger-ui.config-url=/v3/apidocs.json
+  #springdoc.swagger-ui.url=/apidocs.json
+  #springdoc.swagger-ui.path=/apiDocuments
