@@ -1,5 +1,7 @@
 package com.runtracer.runtracerbackend;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -14,8 +16,8 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 import java.util.Arrays;
 
 @Slf4j
-@EnableWebFlux
 @SpringBootApplication
+@OpenAPIDefinition(info = @Info(title = "Runtracer Backend API", version = "1.0.0", description = "API documentation for Runtracer Backend"))
 public class RuntracerBackendApplication {
 
     @Autowired
@@ -30,7 +32,7 @@ public class RuntracerBackendApplication {
     @EventListener
     public void onEventReceived(ApplicationEvent event) {
         if (event instanceof ApplicationReadyEvent) {
-            logAllBeans();
+            log.info("onEventReceived: ApplicationReadyEvent: {}", event.getTimestamp());
         }
     }
 
@@ -41,4 +43,5 @@ public class RuntracerBackendApplication {
             log.info("BEAN: Bean name: {}", beanName);
         }
     }
+
 }
