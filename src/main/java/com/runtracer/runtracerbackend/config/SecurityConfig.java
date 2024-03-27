@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
+import reactor.core.publisher.Mono;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -41,6 +42,7 @@ public class SecurityConfig {
         log.info("Creating ServerSecurityContextRepository bean");
         return new WebSessionServerSecurityContextRepository();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -48,13 +50,18 @@ public class SecurityConfig {
 
     @EventListener(ApplicationReadyEvent.class)
     public void insertAdminUser() {
-        log.info("Application is ready, inserting admin user");
-        User admin = new User();
-        admin.setUsername(adminUsername);
-        admin.setPassword(this.passwordEncoder().encode(adminPassword));
-        admin.setEmail(adminEmail);
-        userService.save(admin)
-                .subscribe(user -> log.info("Admin user checked"),
-                        error -> log.error("Error inserting admin user: {}", error.getMessage()));
+        log.info("Application is ready, checking admin user");
+        userService.findByUsername(adminUsername)
+                .doOnNext(user -> log.info("Admin user already in database"))
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.info("Admin user not found, creating new admin user");
+                    User admin = new User();
+                    admin.setUsername(adminUsername);
+                    admin.setPassword(this.passwordEncoder().encode(adminPassword));
+                    admin.setEmail(adminEmail);
+                    return userService.save(admin)
+                            .doOnSuccess(user -> log.info("Admin user created successfully"));
+                }))
+                .subscribe();
     }
 }

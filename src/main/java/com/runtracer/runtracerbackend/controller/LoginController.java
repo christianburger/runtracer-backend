@@ -4,6 +4,11 @@ import com.runtracer.runtracerbackend.exceptions.InvalidCredentialsException;
 import com.runtracer.runtracerbackend.exceptions.UserNotFoundException;
 import com.runtracer.runtracerbackend.repository.ReactiveOAuth2ClientRegistrationRepository;
 import com.runtracer.runtracerbackend.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +38,13 @@ public class LoginController {
         this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
+    @Operation(summary = "Log in a user", responses = {
+        @ApiResponse(responseCode = "200", description = "Login successful"),
+        @ApiResponse(responseCode = "400", description = "Invalid credentials", content = @Content),
+        @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+    })
     @PostMapping("/login")
-    public Mono<String> login(@RequestBody LoginForm loginForm) {
+    public Mono<String> login(@RequestBody @Parameter(description = "Form with username and password") LoginForm loginForm) {
         log.info("Login attempt for username: {}", loginForm.getUsername());
 
         return userService.findByUsername(loginForm.getUsername())
@@ -55,6 +65,7 @@ public class LoginController {
 
     @Setter
     @Getter
+    @Schema(description = "Form with username and password")
     public static class LoginForm {
         private String username;
         private String password;
