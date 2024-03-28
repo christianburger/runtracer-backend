@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,21 +22,19 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import reactor.core.publisher.Mono;
 
+@Tag(name = "AuthenticationController", description = "Operations pertaining to authentication in Runtracer")
 @Slf4j
 @Component
 @EnableWebFlux
 @RestController
-public class LoginController {
-
+public class AuthenticationController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
-    private final ReactiveOAuth2ClientRegistrationRepository clientRegistrationRepository;
 
     @Autowired
-    public LoginController(UserService userService, PasswordEncoder passwordEncoder, ReactiveOAuth2ClientRegistrationRepository clientRegistrationRepository) {
+    public AuthenticationController(UserService userService, PasswordEncoder passwordEncoder, ReactiveOAuth2ClientRegistrationRepository clientRegistrationRepository) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
-        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @Operation(summary = "Log in a user", responses = {
