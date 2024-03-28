@@ -1,6 +1,6 @@
 package com.runtracer.runtracerbackend;
 
-import com.runtracer.runtracerbackend.controller.LoginController;
+import com.runtracer.runtracerbackend.controller.AuthenticationController;
 import com.runtracer.runtracerbackend.exceptions.InvalidCredentialsException;
 import com.runtracer.runtracerbackend.exceptions.UserNotFoundException;
 import com.runtracer.runtracerbackend.model.User;
@@ -19,10 +19,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class LoginTests {
+public class AuthenticationTests {
 
     @InjectMocks
-    private LoginController loginController;
+    private AuthenticationController authenticationController;
 
     @Mock
     private UserService userService;
@@ -39,11 +39,11 @@ public class LoginTests {
         when(userService.findByUsername("testUser")).thenReturn(Mono.just(user));
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-        LoginController.LoginForm loginForm = new LoginController.LoginForm();
+        AuthenticationController.LoginForm loginForm = new AuthenticationController.LoginForm();
         loginForm.setUsername("testUser");
         loginForm.setPassword("password");
 
-        String response = loginController.login(loginForm).block();
+        String response = authenticationController.login(loginForm).block();
 
         assertEquals("Login successful", response);
     }
@@ -52,11 +52,11 @@ public class LoginTests {
     public void loginWithNonExistentUser() {
         when(userService.findByUsername(anyString())).thenReturn(Mono.empty());
 
-        LoginController.LoginForm loginForm = new LoginController.LoginForm();
+        AuthenticationController.LoginForm loginForm = new AuthenticationController.LoginForm();
         loginForm.setUsername("nonExistentUser");
         loginForm.setPassword("password");
 
-        assertThrows(UserNotFoundException.class, () -> loginController.login(loginForm).block());
+        assertThrows(UserNotFoundException.class, () -> authenticationController.login(loginForm).block());
     }
 
     @Test
@@ -68,10 +68,10 @@ public class LoginTests {
         when(userService.findByUsername("testUser")).thenReturn(Mono.just(user));
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
-        LoginController.LoginForm loginForm = new LoginController.LoginForm();
+        AuthenticationController.LoginForm loginForm = new AuthenticationController.LoginForm();
         loginForm.setUsername("testUser");
         loginForm.setPassword("invalidPassword");
 
-        assertThrows(InvalidCredentialsException.class, () -> loginController.login(loginForm).block());
+        assertThrows(InvalidCredentialsException.class, () -> authenticationController.login(loginForm).block());
     }
 }
