@@ -10,5 +10,6 @@ public interface ActivityService {
     Mono<Activity> findById(UUID id);
     Flux<Activity> findAll();
     <S extends Activity> Mono<S> save(S entity);
+    Mono<Activity> update(UUID id, Activity entity);
     Mono<Void> deleteById(UUID id);
 }

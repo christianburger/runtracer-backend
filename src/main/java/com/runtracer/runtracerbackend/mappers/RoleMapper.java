@@ -8,6 +8,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @Mapper
 public interface RoleMapper {
     default GrantedAuthority roleToGrantedAuthority(Role role) {
-        return new SimpleGrantedAuthority(role.getName());
+        return new SimpleGrantedAuthority(role.getAuthority());
+    }
+
+    default Role grantedAuthorityToRole(GrantedAuthority grantedAuthority) {
+        Role role = new Role();
+        role.setAuthority(grantedAuthority.getAuthority());
+        return role;
     }
 }

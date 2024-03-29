@@ -36,4 +36,13 @@ public class ActivityServiceImpl implements ActivityService {
     public Mono<Void> deleteById(UUID id) {
         return activityRepository.deleteById(id).then(Mono.empty());
     }
+
+    @Override
+    public Mono<Activity> update(UUID id, Activity entity) {
+        return activityRepository.findById(id)
+                .flatMap(existingActivity -> {
+                    entity.setId(existingActivity.getId());
+                    return activityRepository.save(entity);
+                });
+    }
 }
