@@ -3,6 +3,7 @@ package com.runtracer.runtracerbackend.controller;
 import com.runtracer.runtracerbackend.dto.ActivityDto;
 import com.runtracer.runtracerbackend.model.activity.Activity;
 import com.runtracer.runtracerbackend.service.ActivityService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
+@Slf4j
 public class ActivityControllerTest {
 
     @Autowired
@@ -34,6 +36,8 @@ public class ActivityControllerTest {
         UUID id = UUID.randomUUID();
         Activity activity = new Activity();
         activity.setId(id);
+
+        log.info("UUID id = " +  id);
 
         ActivityDto expectedActivityDto = new ActivityDto();
         expectedActivityDto.setId(id);
