@@ -1,19 +1,11 @@
 package com.runtracer.runtracerbackend.mappers;
 
+import com.runtracer.runtracerbackend.dto.RoleDto;
 import com.runtracer.runtracerbackend.model.Role;
 import org.mapstruct.Mapper;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface RoleMapper {
-    default GrantedAuthority roleToGrantedAuthority(Role role) {
-        return new SimpleGrantedAuthority(role.getAuthority());
-    }
-
-    default Role grantedAuthorityToRole(GrantedAuthority grantedAuthority) {
-        Role role = new Role();
-        role.setAuthority(grantedAuthority.getAuthority());
-        return role;
-    }
+    RoleDto toDto(Role role);
+    Role toEntity(RoleDto roleDto);
 }

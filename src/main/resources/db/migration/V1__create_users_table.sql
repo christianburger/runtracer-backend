@@ -1,6 +1,12 @@
 CREATE TABLE IF NOT EXISTS users (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
   username VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE
+  email VARCHAR(255) NOT NULL UNIQUE,
+  enabled BOOLEAN NOT NULL,
+  account_non_expired BOOLEAN NOT NULL,
+  account_non_locked BOOLEAN NOT NULL,
+  credentials_non_expired BOOLEAN NOT NULL,
+  google_id VARCHAR(255),
+  image_url VARCHAR(255)
 );

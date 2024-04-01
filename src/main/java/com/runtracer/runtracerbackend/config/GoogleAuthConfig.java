@@ -22,7 +22,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebFluxSecurity
 @Slf4j
-@Profile("mariadb-flyway-dev")
+@Profile("google-auth")
 public class GoogleAuthConfig {
 
     @Autowired
@@ -65,6 +65,7 @@ public class GoogleAuthConfig {
         SecurityWebFilterChain securityWebFilterChain = http
                 .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
                 .oauth2Login(withDefaults())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
         log.info("Security Web Filter Chain: {}", securityWebFilterChain);
         return securityWebFilterChain;

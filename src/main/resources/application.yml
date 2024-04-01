@@ -30,6 +30,8 @@ spring:
       org.springframework: DEBUG
       org.springframework.beans: DEBUG
       org.springframework.context: DEBUG
+      org.springframework.web: DEBUG
+      io.r2dbc.spi: DEBUG
 
   r2dbc:
     url: r2dbc:mariadb://localhost:3306/${DATABASE_NAME}

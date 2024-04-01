@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class PositionDataDto {
+    private Long activityId;
     private Long timestamp;
     private Long latitude;
     private Long longitude;

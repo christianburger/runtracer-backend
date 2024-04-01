@@ -7,12 +7,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.UUID;
 
 @Tag(name = "ActivityController", description = "Operations pertaining to activities in Runtracer")
 @RestController
@@ -39,13 +38,14 @@ public class ActivityController {
 
     @Operation(summary = "Get the name of the application")
     @GetMapping("/api/appName")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public String getAppName() {
         return applicationName;
     }
 
     @Operation(summary = "Get an activity by its ID")
     @GetMapping("/api/activities/{id}")
-    public Mono<ActivityDto> getActivity(@PathVariable UUID id) {
+    public Mono<ActivityDto> getActivity(@PathVariable Long id) {
         return activityService.findById(id)
                 .map(activityMapper::toDto);
     }
@@ -59,7 +59,7 @@ public class ActivityController {
 
     @Operation(summary = "Update an existing activity")
     @PutMapping("/api/activities/{id}")
-    public Mono<ActivityDto> updateActivity(@PathVariable UUID id, @RequestBody ActivityDto activityDto) {
+    public Mono<ActivityDto> updateActivity(@PathVariable Long id, @RequestBody ActivityDto activityDto) {
         return activityService.update(id, activityMapper.toEntity(activityDto))
                 .map(activityMapper::toDto);
     }
@@ -73,7 +73,7 @@ public class ActivityController {
 
     @Operation(summary = "Delete an activity by its ID")
     @DeleteMapping("/api/activities/{id}")
-    public Mono<Void> deleteActivity(@PathVariable UUID id) {
+    public Mono<Void> deleteActivity(@PathVariable Long id) {
         return activityService.deleteById(id);
     }
 

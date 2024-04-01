@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS position_data (
+  position_data_id BIGINT PRIMARY KEY AUTO_INCREMENT,
   timestamp BIGINT,
   latitude BIGINT,
   longitude BIGINT,
   height INT,
-  activity_id UUID,
-  FOREIGN KEY (activity_id) REFERENCES activity(id)
+  activity_id BIGINT NOT NULL
 );
