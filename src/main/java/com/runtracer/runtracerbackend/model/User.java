@@ -1,23 +1,29 @@
 package com.runtracer.runtracerbackend.model;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
+@Getter
+@Setter
 @Table("users")
 public class User implements UserDetails {
 
     @Id
-    @Column("id")
-    private Long id;
+    private Long userId;
 
     @Column("username")
     private String username;
@@ -28,12 +34,32 @@ public class User implements UserDetails {
     @Column("email")
     private String email;
 
-    @Transient  // We'll handle this manually
+    @Transient
     private List<Role> roles;
+
+    @Column("enabled")
+    private boolean enabled;
+
+    @Column("account_non_expired")
+    private boolean accountNonExpired;
+
+    @Column("account_non_locked")
+    private boolean accountNonLocked;
+
+    @Column("credentials_non_expired")
+    private boolean credentialsNonExpired;
+
+    @Column("google_id")
+    private String googleId;
+
+    @Column("image_url")
+    private String imageUrl;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().toString()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -48,21 +74,21 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return accountNonExpired;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return accountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return credentialsNonExpired;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }
