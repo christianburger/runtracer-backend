@@ -2,35 +2,22 @@ package com.runtracer.runtracerbackend.model.activity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.List;
-import java.util.UUID;
-
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Table
+@Getter
+@Setter
+@Table("activity")
 public class Activity {
 
     @Id
-    private UUID id;
+    private Long activityId;
 
     @Column("user_id")
     private Long userId;
-
-    @Column("position_data")
-    private List<PositionData> positionData;
-
-    @Column("heartbeat_data")
-    private List<HeartbeatData> heartbeatData;
-
-    @Column("movement_data")
-    private List<MovementData> movementData;
-
-    @Column("step_data")
-    private List<StepData> stepData;
 }

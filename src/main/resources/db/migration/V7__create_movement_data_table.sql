@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS movement_data (
+  movement_data_id BIGINT PRIMARY KEY,
   timestamp BIGINT,
-  up INT,
-  down INT,
+  move_up INT,
+  move_down INT,
   move_left INT,
   move_right INT,
-  activity_id UUID,
-  FOREIGN KEY (activity_id) REFERENCES activity(id)
+  activity_id BIGINT NOT NULL
 );
