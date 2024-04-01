@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class ApiUserResponse {
@@ -11,7 +12,7 @@ public class ApiUserResponse {
 
     @Data
     public static class UserDto {
-        private Long id;
+        private UUID id;
         private String username;
         private String password;
         private String email;
