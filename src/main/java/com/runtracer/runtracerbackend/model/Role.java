@@ -1,18 +1,20 @@
 package com.runtracer.runtracerbackend.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@Table("roles")
 public class Role implements GrantedAuthority {
 
     @Id
-    private Long id;
+    private Long roleId;
     private RoleType name;
 
     @Override

@@ -4,9 +4,10 @@ import lombok.Data;
 
 @Data
 public class MovementDataDto {
+    private Long activityId;
     private Long timestamp;
-    private Integer up;
-    private Integer down;
-    private Integer left;
-    private Integer right;
+    private Integer moveUp;
+    private Integer moveDown;
+    private Integer moveLeft;
+    private Integer moveRight;
 }

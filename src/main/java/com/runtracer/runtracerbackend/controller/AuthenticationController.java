@@ -1,19 +1,18 @@
 package com.runtracer.runtracerbackend.controller;
 
+import com.runtracer.runtracerbackend.dto.UserDto;
 import com.runtracer.runtracerbackend.exceptions.InvalidCredentialsException;
 import com.runtracer.runtracerbackend.exceptions.UserNotFoundException;
 import com.runtracer.runtracerbackend.repository.ReactiveOAuth2ClientRegistrationRepository;
 import com.runtracer.runtracerbackend.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,28 +36,36 @@ public class AuthenticationController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Operation(summary = "Log in a user", responses = {
-        @ApiResponse(responseCode = "200", description = "Login successful"),
-        @ApiResponse(responseCode = "400", description = "Invalid credentials", content = @Content),
-        @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
-    })
+
     @PostMapping("/login")
     public Mono<String> login(@RequestBody @Parameter(description = "Form with username and password") LoginForm loginForm) {
         log.info("Login attempt for username: {}", loginForm.getUsername());
 
-        return userService.findByUsername(loginForm.getUsername())
-                .switchIfEmpty(Mono.defer(() -> {
+        UserDto userDto = new UserDto();
+        userDto.setUsername(loginForm.getUsername());
+        userDto.setPassword(loginForm.getPassword());
+
+        log.info("Created UserDto with username: {} and password: {}", userDto.getUsername(), userDto.getPassword());
+
+        return userService.authenticateFromDto(userDto)
+                .map(user -> {
+                    log.info("Login successful for username: {}", loginForm.getUsername());
+                    return "Login successful";
+                })
+                .doOnEach(signal -> {
+                    if (signal.hasError()) {
+                        log.error("Error occurred during authentication: ", signal.getThrowable());
+                    } else if (signal.isOnComplete()) {
+                        log.info("Authentication completed without error");
+                    }
+                })
+                .onErrorResume(InvalidCredentialsException.class, e -> {
+                    log.error("Invalid credentials for username: {}", loginForm.getUsername());
+                    throw new InvalidCredentialsException();
+                })
+                .onErrorResume(UsernameNotFoundException.class, e -> {
                     log.error("User not found for username: {}", loginForm.getUsername());
                     throw new UserNotFoundException();
-                }))
-                .flatMap(user -> {
-                    boolean passwordMatches = passwordEncoder.matches(loginForm.getPassword(), user.getPassword());
-                    log.info("Password matches for username: {}: {}", loginForm.getUsername(), passwordMatches);
-
-                    if (!passwordMatches) {
-                        throw new InvalidCredentialsException();
-                    }
-                    return Mono.just("Login successful");
                 });
     }
 

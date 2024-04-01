@@ -15,10 +15,13 @@ public class ServerSecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, ServerSecurityContextRepository securityContextRepository) {
         return http.authorizeExchange()
-                .pathMatchers("/public/**").permitAll()
+                .pathMatchers("/public/**", "/login").permitAll() // Allow unauthenticated access to /login
+                .pathMatchers("/**").authenticated()
                 .pathMatchers(HttpMethod.POST, "/api/**").authenticated()
-                .pathMatchers("/admin/**").hasRole("ADMIN")
+                .pathMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyExchange().permitAll()
+                .and()
+                .formLogin()
                 .and()
                 .httpBasic().and()
                 .securityContextRepository(securityContextRepository)
