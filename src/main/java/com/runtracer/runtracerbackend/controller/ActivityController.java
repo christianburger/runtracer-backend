@@ -13,6 +13,8 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Tag(name = "ActivityController", description = "Operations pertaining to activities in Runtracer")
 @RestController
 @EnableWebFlux
@@ -45,7 +47,7 @@ public class ActivityController {
 
     @Operation(summary = "Get an activity by its ID")
     @GetMapping("/api/activities/{id}")
-    public Mono<ActivityDto> getActivity(@PathVariable Long id) {
+    public Mono<ActivityDto> getActivity(@PathVariable UUID id) {
         return activityService.findById(id)
                 .map(activityMapper::toDto);
     }
@@ -59,7 +61,7 @@ public class ActivityController {
 
     @Operation(summary = "Update an existing activity")
     @PutMapping("/api/activities/{id}")
-    public Mono<ActivityDto> updateActivity(@PathVariable Long id, @RequestBody ActivityDto activityDto) {
+    public Mono<ActivityDto> updateActivity(@PathVariable UUID id, @RequestBody ActivityDto activityDto) {
         return activityService.update(id, activityMapper.toEntity(activityDto))
                 .map(activityMapper::toDto);
     }
@@ -73,7 +75,7 @@ public class ActivityController {
 
     @Operation(summary = "Delete an activity by its ID")
     @DeleteMapping("/api/activities/{id}")
-    public Mono<Void> deleteActivity(@PathVariable Long id) {
+    public Mono<Void> deleteActivity(@PathVariable UUID id) {
         return activityService.deleteById(id);
     }
 

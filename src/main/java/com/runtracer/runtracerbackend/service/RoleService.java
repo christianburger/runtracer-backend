@@ -5,10 +5,13 @@ import com.runtracer.runtracerbackend.model.Role;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 public interface RoleService {
     Mono<RoleDto> findByNameDto(String name);
     Flux<RoleDto> findAllDto();
     Mono<RoleDto> saveDto(RoleDto roleDto);
     Mono<Void> deleteByNameDto(String name);
     Mono<Role> save(Role role);
+    Mono<Role> findById(UUID id);
 }

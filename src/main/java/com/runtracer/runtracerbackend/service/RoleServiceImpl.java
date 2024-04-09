@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 public class RoleServiceImpl implements RoleService {
@@ -49,5 +51,10 @@ public class RoleServiceImpl implements RoleService {
         return roleRepository.save(role)
                 .doOnSuccess(savedRole -> log.info("Saved role: {}", savedRole))
                 .doOnError(e -> log.error("Error occurred while saving role: ", e));
+    }
+
+    @Override
+    public Mono<Role> findById(UUID id) {
+        return roleRepository.findById(id);
     }
 }

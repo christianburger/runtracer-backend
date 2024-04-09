@@ -2,9 +2,11 @@ package com.runtracer.runtracerbackend.dto;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class MovementDataDto {
-    private Long activityId;
+    private UUID activityId;
     private Long timestamp;
     private Integer moveUp;
     private Integer moveDown;

@@ -1,8 +1,10 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE IF NOT EXISTS position_data (
-  position_data_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  position_data_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   timestamp BIGINT,
   latitude BIGINT,
   longitude BIGINT,
   height INT,
-  activity_id BIGINT NOT NULL
+  activity_id UUID NOT NULL
 );

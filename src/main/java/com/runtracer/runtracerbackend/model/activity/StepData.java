@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @Getter
@@ -15,11 +17,11 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("step_data")
 public class StepData {
     @Id
-    private Long stepDataId;
+    private UUID stepDataId;
     @Column("timestamp")
     private Long timestamp;
     @Column("steps")
     private Integer steps;
     @Column("activity_id")
-    private Long activityId;
+    private UUID activityId;
 }

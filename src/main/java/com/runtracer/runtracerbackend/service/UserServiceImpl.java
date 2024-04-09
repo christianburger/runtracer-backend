@@ -3,200 +3,123 @@ package com.runtracer.runtracerbackend.service;
 import com.runtracer.runtracerbackend.config.SecurityConfig;
 import com.runtracer.runtracerbackend.dto.UserDto;
 import com.runtracer.runtracerbackend.exceptions.InvalidCredentialsException;
-import com.runtracer.runtracerbackend.mappers.*;
-import com.runtracer.runtracerbackend.model.Role;
+import com.runtracer.runtracerbackend.mappers.RoleMapper;
+import com.runtracer.runtracerbackend.mappers.UserMapper;
+import com.runtracer.runtracerbackend.mappers.UserRoleMapper;
 import com.runtracer.runtracerbackend.model.User;
 import com.runtracer.runtracerbackend.model.UserRole;
-import com.runtracer.runtracerbackend.repository.*;
-import lombok.extern.slf4j.Slf4j;
+import com.runtracer.runtracerbackend.repository.RoleRepository;
+import com.runtracer.runtracerbackend.repository.UserRepository;
+import com.runtracer.runtracerbackend.repository.UserRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
-@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    private UserRoleRepository userRoleRepository;
+    private final UserRoleRepository userRoleRepository;
 
     @Autowired
-    private ActivityRepository activityRepository;
-
-    @Autowired
-    private StepDataRepository stepDataRepository;
-
-    @Autowired
-    private HeartbeatDataRepository heartbeatDataRepository;
-
-    @Autowired
-    private MovementDataRepository movementDataRepository;
-
-    @Autowired
-    private PositionDataRepository positionDataRepository;
-
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     @Autowired
     private RoleMapper roleMapper;
 
     @Autowired
-    private RoleService roleService;
-
-    @Autowired
     private UserRoleMapper userRoleMapper;
 
     @Autowired
-    private ActivityMapper activityMapper;
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository, UserMapper userMapper, RoleMapper roleMapper, UserRoleMapper userRoleMapper, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.userMapper = userMapper;
+        this.roleMapper = roleMapper;
+        this.userRoleMapper = userRoleMapper;
+        this.passwordEncoder = SecurityConfig.getPasswordEncoder();
+    }
 
-    @Autowired
-    private PositionDataMapper positionDataMapper;
-
-    @Autowired
-    private HeartbeatDataMapper heartbeatDataMapper;
-
-    @Autowired
-    private MovementDataMapper movementDataMapper;
-
-    @Autowired
-    private StepDataMapper stepDataMapper;
-    @Autowired
-    private TransactionalOperator transactionalOperator;
-
+    // other methods...
+    @Override
     public Mono<UserDto> authenticateFromDto(UserDto userDto) {
-        PasswordEncoder passwordEncoder = SecurityConfig.getPasswordEncoder();
-        log.info("Authenticating user: {}", userDto.getUsername());
-
         return userRepository.findByUsername(userDto.getUsername())
-                .switchIfEmpty(Mono.defer(() -> {
-                    log.error("User not found for username: {}", userDto.getUsername());
-                    return Mono.error(new UsernameNotFoundException("User Not Found"));
-                }))
-                .flatMap(user -> {
-                    log.info("Fetched user from database: {}", user);
-                    boolean passwordMatches = passwordEncoder.matches(userDto.getPassword(), user.getPassword());
-                    log.info("Password matches for username: {}: {}", userDto.getUsername(), passwordMatches);
+                .filter(user -> passwordEncoder.matches(userDto.getPassword(), user.getPassword()))
+                .map(userMapper::toDto)
+                .switchIfEmpty(Mono.error(new InvalidCredentialsException()));
+    }
 
-                    if (!passwordMatches) {
-                        log.error("Password does not match for username: {}", userDto.getUsername());
-                        return Mono.error(new InvalidCredentialsException());
-                    }
-                    log.info("Password matched for username: {}", userDto.getUsername());
-                    return Mono.just(userMapper.toDto(user));
+    @Override
+    public Mono<UserDto> findByIdDto(UUID id) {
+        return userRepository.findById(id)
+                .map(userMapper::toDto);
+    }
+
+    @Override
+    public Mono<UserDto> updateDto(UUID id, UserDto userDto) {
+        return userRepository.findById(id)
+                .map(existingUser -> {
+                    existingUser.setUsername(userDto.getUsername());
+                    existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
+                    existingUser.setEmail(userDto.getEmail());
+                    existingUser.setGoogleId(userDto.getGoogleId());
+                    existingUser.setImageUrl(userDto.getImageUrl());
+                    return existingUser;
                 })
-                .doOnEach(signal -> {
-                    if (signal.hasError()) {
-                        log.error("Error occurred during authentication: ", signal.getThrowable());
-                    } else if (signal.isOnComplete()) {
-                        log.info("Authentication completed without error");
-                    }
-                });
+                .flatMap(userRepository::save)
+                .map(userMapper::toDto);
     }
 
-    public Mono<UserDto> findByIdDto(Long id) {
-        log.info("Fetching user with id: {}", id);
-        Mono<UserDto> userDtoMono = Mono.empty();
-        log.info("Fetched user: {}", userDtoMono);
-        return userDtoMono;
-    }
-
-    public Mono<UserDto> updateDto(Long id, UserDto userDto) {
-        log.info("Updating user with id: {} with data: {}", id, userDto);
-        Mono<UserDto> updatedUserDtoMono = Mono.empty();
-        log.info("Updated user: {}", updatedUserDtoMono);
-        return updatedUserDtoMono;
-    }
-
+    @Override
     public Flux<UserDto> findAllDto() {
-        log.info("Fetching all users");
-        Flux<UserDto> usersFlux = Flux.empty();
-        log.info("Fetched users: {}", usersFlux);
-        return usersFlux;
-    }
-
-    private Mono<User> saveEntitiesFromDto(UserDto userDto) {
-        log.info("Extracting User from UserDto: {}", userDto);
-        User user = userMapper.toEntity(userDto);
-        Role role = roleMapper.toEntity(userDto.getRoles().get(0));
-        UserRole userRole = new UserRole();
-        userRole.setUserId(user.getUserId());
-        userRole.setRoleId(role.getRoleId());
-
-        log.info("Extracted User: {}", user);
-        log.info("Extracted Role: {}", role);
-        log.info("Extracted UserRole: {}", userRole);
-
-        log.info("User UUID: {}", user.getUserId());
-        log.info("Role UUID: {}", role.getRoleId());
-
-        Mono<User> savedUser = this.save(user);
-        Mono<Role> savedRole = this.saveRole(role);
-        Mono<UserRole> savedUserRole = this.saveUserRole(userRole);
-
-        log.info("Saved User: {}", savedUser);
-        log.info("Saved Role: {}", savedRole);
-        log.info("Saved UserRole: {}", savedUserRole);
-
-        return savedUser;
-    }
-
-    public Mono<User> save(User user) {
-        log.info("Saving User: {}", user);
-        return userRepository.save(user)
-                .doOnNext(savedUser -> log.info("Saved User: {}", savedUser))
-                .doOnError(e -> log.error("Error occurred while saving User: ", e));
-    }
-
-    private Mono<Role> saveRole(Role role) {
-        log.info("Saving Role: {}", role);
-        return roleRepository.save(role)
-                .doOnNext(savedRole -> log.info("Saved Role: {}", savedRole))
-                .doOnError(e -> log.error("Error occurred while saving Role: ", e));
-    }
-
-    public Mono<UserRole> saveUserRole(UserRole userRole) {
-        log.info("Saving UserRole: {}", userRole);
-        return userRoleRepository.save(userRole)
-                .doOnNext(savedUserRole -> log.info("Saved UserRole: {}", savedUserRole))
-                .doOnError(e -> log.error("Error occurred while saving UserRole: ", e));
+        return userRepository.findAll()
+                .map(userMapper::toDto);
     }
 
     @Override
     public Mono<UserDto> saveDto(UserDto userDto) {
-        log.info("Starting saveDto method with UserDto: {}", userDto);
-
-        return transactionalOperator.transactional(saveEntitiesFromDto(userDto)
-                        .flatMap(user -> Mono.just(userMapper.toDto(user))))
-                .doOnNext(savedUserDto -> log.info("Finished saveDto method with UserDto: {}", savedUserDto))
-                .doOnError(e -> log.error("Error occurred during saveDto method: ", e));
+        User user = userMapper.toEntity(userDto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user)
+                .map(userMapper::toDto);
     }
 
-    public Mono<Void> deleteByIdDto(Long id) {
-        log.info("Deleting user with id: {}", id);
-        Mono<Void> deletedUserMono = Mono.empty();
-        log.info("Deleted user with id: {}", id);
-        return deletedUserMono;
+    @Override
+    public Mono<Void> deleteByIdDto(UUID id) {
+        return userRepository.deleteById(id);
+    }
+
+    @Override
+    public Mono<User> save(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
+    public Mono<UserRole> saveUserRole(UserRole userRole) {
+        return userRoleRepository.save(userRole);
     }
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        log.info("Fetching user by username: {}", username);
-
         return userRepository.findByUsername(username)
-                .switchIfEmpty(Mono.defer(() -> Mono.error(new UsernameNotFoundException("User Not Found"))))
-                .cast(UserDetails.class)
-                .doOnNext(userDetails -> log.info("Fetched user: {}", userDetails));
+                .flatMap(user -> userRoleRepository.findByUserId(user.getUserId())
+                        .flatMap(userRole -> roleRepository.findById(userRole.getRoleId()))
+                        .collectList()
+                        .doOnNext(user::setRoles)
+                        .thenReturn(user));
     }
 }
