@@ -11,9 +11,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @Configuration
@@ -52,6 +50,20 @@ public class AdminUserConfig {
 
         log.info("Admin user details: {}", admin);
 
+        // First, check if the user already exists
+        userService.findByUsername(adminUsername)
+                .hasElement()
+                .subscribe(userExists -> {
+                    if (userExists) {
+                        log.info("Admin user already exists");
+                    } else {
+                        // If the user does not exist, save the new user
+                        saveAdminUser(admin);
+                    }
+                });
+    }
+
+    private void saveAdminUser(User admin) {
         userService.save(admin)
                 .doOnNext(user -> log.info("Saved user: {}", user))
                 .doOnError(e -> log.error("Error occurred while saving user: ", e))
@@ -75,15 +87,6 @@ public class AdminUserConfig {
                             });
                 })
                 .doOnSuccess(user -> log.info("Admin user created successfully"))
-                .onErrorResume(DataIntegrityViolationException.class, ex -> {
-                    if (ex.getMessage().contains("duplicate key value")) {
-                        log.info("Admin user already exists");
-                        return Mono.empty();
-                    } else {
-                        log.error("An error occurred while creating the admin user", ex);
-                        return Mono.empty();
-                    }
-                })
                 .subscribe();
     }
 }
