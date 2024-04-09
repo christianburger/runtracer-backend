@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 public class ActivityServiceImpl implements ActivityService {
 
@@ -37,7 +39,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public Mono<Activity> findById(Long id) {
+    public Mono<Activity> findById(UUID id) {
         return activityRepository.findById(id);
     }
 
@@ -52,10 +54,11 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public Mono<Activity> update(Long id, Activity entity) {
+    public Mono<Activity> update(UUID id, Activity entity) {
         return Mono.empty();
     }
 
+    @Override
     public Mono<ActivityDto> saveDto(ActivityDto activityDto) {
 
         Activity activity = activityMapper.toEntity(activityDto);
@@ -63,7 +66,7 @@ public class ActivityServiceImpl implements ActivityService {
         // Save the Activity using the ActivityRepository
         return activityRepository.save(activity).flatMap(savedActivity -> {
             // Set the saved activity's ID to the other entities
-            Long activityId = savedActivity.getActivityId();
+            UUID activityId = savedActivity.getActivityId();
 
             // Save the other entities
             return Mono.when(Flux.fromIterable(activityDto.getHeartbeatData()).map(heartbeatDataMapper::toEntity).doOnNext(data -> data.setActivityId(activityId)).flatMap(heartbeatDataRepository::save),
@@ -74,7 +77,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public Mono<Void> deleteById(Long id) {
+    public Mono<Void> deleteById(UUID id) {
         return activityRepository.deleteById(id);
     }
 }

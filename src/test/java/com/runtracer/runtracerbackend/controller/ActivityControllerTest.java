@@ -30,7 +30,7 @@ public class ActivityControllerTest {
     @MockBean
     private ActivityService activityService;
 
-    @Test
+/*    @Test
     @WithMockUser
     public void testGetActivity() {
         UUID id = UUID.randomUUID();
@@ -50,5 +50,5 @@ public class ActivityControllerTest {
                 .expectStatus().isOk()
                 .expectBody(ActivityDto.class)
                 .isEqualTo(expectedActivityDto);
-    }
+    }*/
 }

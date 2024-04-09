@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @Getter
@@ -15,7 +17,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("movement_data")
 public class MovementData {
     @Id
-    private Long movementDataId;
+    private UUID movementDataId;
     @Column("timestamp")
     private Long timestamp;
     @Column("move_up")
@@ -27,5 +29,5 @@ public class MovementData {
     @Column("move_right")
     private Integer moveRight;
     @Column("activity_id")
-    private Long activityId;
+    private UUID activityId;
 }

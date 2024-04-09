@@ -7,6 +7,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.UUID;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -14,9 +16,9 @@ import org.springframework.data.relational.core.mapping.Table;
 public class UserRole {
     @Id
     @Column("user_role_id")
-    private Long userRoleId;
+    private UUID userRoleId;
     @Column("user_id")
-    private Long userId;
+    private UUID userId;
     @Column("role_id")
-    private Long roleId;
+    private UUID roleId;
 }
