@@ -9,7 +9,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 
 @Configuration
-@Profile("mariadb-flyway-dev")
+@Profile({"mariadb-flyway-dev",  "postgresql-flyway-dev"})
 public class ServerSecurityConfig {
 
     @Bean

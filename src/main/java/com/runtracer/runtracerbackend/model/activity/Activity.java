@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @Getter
@@ -16,8 +18,8 @@ import org.springframework.data.relational.core.mapping.Table;
 public class Activity {
 
     @Id
-    private Long activityId;
+    private UUID activityId;
 
     @Column("user_id")
-    private Long userId;
+    private UUID userId;
 }

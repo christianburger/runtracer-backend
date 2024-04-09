@@ -8,8 +8,10 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Repository
-public interface UserRepository extends R2dbcRepository<User, Long> {
+public interface UserRepository extends R2dbcRepository<User, UUID> {
 
     Mono<User> findByUsername(String username);
 
@@ -27,7 +29,7 @@ public interface UserRepository extends R2dbcRepository<User, Long> {
 
     @Override
     @NonNull
-    Mono<User> findById(@NonNull Long id);
+    Mono<User> findById(@NonNull UUID id);
 
     @Override
     @NonNull
@@ -35,5 +37,5 @@ public interface UserRepository extends R2dbcRepository<User, Long> {
 
     @Override
     @NonNull
-    Mono<Void> deleteById(@NonNull Long id);
+    Mono<Void> deleteById(@NonNull UUID id);
 }

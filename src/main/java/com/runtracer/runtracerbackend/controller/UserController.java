@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,7 +29,7 @@ public class UserController {
 
     @Operation(summary = "Get a user by its ID")
     @GetMapping("/{id}")
-    public Mono<UserDto> getUser(@PathVariable Long id) {
+    public Mono<UserDto> getUser(@PathVariable UUID id) {
         log.info("Fetching user with id: {}", id);
         Mono<UserDto> userDtoMono = userService.findByIdDto(id);
         log.info("Fetched user: {}", userDtoMono);
@@ -46,7 +48,7 @@ public class UserController {
 
     @Operation(summary = "Update an existing user")
     @PutMapping("/{id}")
-    public Mono<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+    public Mono<UserDto> updateUser(@PathVariable UUID id, @RequestBody UserDto userDto) {
         log.info("Updating user with id: {} with data: {}", id, userDto);
         Mono<UserDto> updatedUserDtoMono = userService.updateDto(id, userDto);
         log.info("Updated user: {}", updatedUserDtoMono);
@@ -64,7 +66,7 @@ public class UserController {
 
     @Operation(summary = "Delete a user by its ID")
     @DeleteMapping("/{id}")
-    public Mono<Void> deleteUser(@PathVariable Long id) {
+    public Mono<Void> deleteUser(@PathVariable UUID id) {
         log.info("Deleting user with id: {}", id);
         Mono<Void> deletedUserMono = userService.deleteByIdDto(id);
         log.info("Deleted user with id: {}", id);

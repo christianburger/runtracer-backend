@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @Getter
@@ -15,7 +17,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("position_data")
 public class PositionData {
     @Id
-    private Long positionDataId;
+    private UUID positionDataId;
     @Column("timestamp")
     private Long timestamp;
     @Column("latitude")
@@ -25,5 +27,5 @@ public class PositionData {
     @Column("height")
     private Integer height;
     @Column("activity_id")
-    private Long activityId;
+    private UUID activityId;
 }

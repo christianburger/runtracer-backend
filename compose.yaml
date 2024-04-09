@@ -11,6 +11,18 @@ services:
     ports:
       - "3306:3306"  # Map container port 3306 to host port 3306
 
+  postgresql:
+    image: postgres:latest
+    environment:
+      #POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - ${POSTGRESQL_VOLUME_PATH}:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   h2:
     image: oscarfonts/h2
     volumes:
@@ -19,3 +31,4 @@ services:
       - "9092:9092"
     environment:
       H2_OPTIONS: -ifNotExists -web -webAllowOthers -tcp -tcpAllowOthers
+
