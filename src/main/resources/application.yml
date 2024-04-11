@@ -33,11 +33,6 @@ spring:
       org.springframework.web: DEBUG
       io.r2dbc.spi: DEBUG
 
-  r2dbc:
-    url: r2dbc:mariadb://localhost:3306/${DATABASE_NAME}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
-
 security:
   oauth2:
     client:

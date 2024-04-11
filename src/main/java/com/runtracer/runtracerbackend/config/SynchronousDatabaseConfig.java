@@ -90,7 +90,7 @@ public class SynchronousDatabaseConfig {
         }
     }
 
-    @Bean
+/*    @Bean
     public ConnectionFactory connectionFactory() {
 
         ConnectionFactoryOptions options = ConnectionFactoryOptions.parse(r2dbc_url).mutate().option(ConnectionFactoryOptions.USER, username).option(ConnectionFactoryOptions.PASSWORD, password).option(Option.valueOf("SSL"), false).build();
@@ -111,7 +111,7 @@ public class SynchronousDatabaseConfig {
         log.info("Connection Factory: {}", connectionFactory);
 
         return connectionFactory;
-    }
+    }*/
 
     @Bean
     public DatabaseClient databaseClient(ConnectionFactory connectionFactory) {

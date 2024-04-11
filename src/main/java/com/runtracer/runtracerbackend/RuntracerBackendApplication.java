@@ -11,7 +11,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
-import org.springframework.web.reactive.config.EnableWebFlux;
 
 import java.util.Arrays;
 
@@ -43,5 +42,4 @@ public class RuntracerBackendApplication {
             log.info("BEAN: Bean name: {}", beanName);
         }
     }
-
 }

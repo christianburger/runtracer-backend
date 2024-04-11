@@ -3,6 +3,7 @@ package com.runtracer.runtracerbackend.service;
 import com.runtracer.runtracerbackend.config.SecurityConfig;
 import com.runtracer.runtracerbackend.dto.UserDto;
 import com.runtracer.runtracerbackend.exceptions.InvalidCredentialsException;
+import com.runtracer.runtracerbackend.exceptions.UserNotFoundException;
 import com.runtracer.runtracerbackend.mappers.RoleMapper;
 import com.runtracer.runtracerbackend.mappers.UserMapper;
 import com.runtracer.runtracerbackend.mappers.UserRoleMapper;
@@ -54,13 +55,13 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = SecurityConfig.getPasswordEncoder();
     }
 
-    // other methods...
     @Override
     public Mono<UserDto> authenticateFromDto(UserDto userDto) {
         return userRepository.findByUsername(userDto.getUsername())
+                .switchIfEmpty(Mono.error(new UserNotFoundException())) // throw UserNotFoundException if user does not exist
                 .filter(user -> passwordEncoder.matches(userDto.getPassword(), user.getPassword()))
                 .map(userMapper::toDto)
-                .switchIfEmpty(Mono.error(new InvalidCredentialsException()));
+                .switchIfEmpty(Mono.error(new InvalidCredentialsException())); // throw InvalidCredentialsException if password does not match
     }
 
     @Override

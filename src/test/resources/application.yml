@@ -9,9 +9,14 @@ application:
     email: ${ADMIN_EMAIL}
 
 spring:
-  profiles:
-    active: mariadb-flyway-dev
+  webflux:
+    base-path: /
+  web:
+    resources:
+      add-mappings: false
 
+  profiles:
+    active: postgresql-flyway-dev
 
   server:
     port: ${SERVER_PORT}
@@ -25,11 +30,8 @@ spring:
       org.springframework: DEBUG
       org.springframework.beans: DEBUG
       org.springframework.context: DEBUG
-
-  r2dbc:
-    url: r2dbc:mariadb://localhost:3306/${DATABASE_NAME}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+      org.springframework.web: DEBUG
+      io.r2dbc.spi: DEBUG
 
 security:
   oauth2:
@@ -46,12 +48,18 @@ security:
             - email
 
 springdoc:
+  packagesToScan: com.runtracer.runtracerbackend.controller
   show-actuator: true
   version: 1.8
-
   api-docs:
-    enabled: false
     path: /api-docs
   swagger-ui:
     enabled: true
-    url: /swagger-ui.html
+    path: /swagger-ui/index.html
+#    config-url:  /swagger-ui/index.html
+
+
+  #Open Api 3.0
+  #springdoc.swagger-ui.config-url=/v3/apidocs.json
+  #springdoc.swagger-ui.url=/apidocs.json
+  #springdoc.swagger-ui.path=/apiDocuments

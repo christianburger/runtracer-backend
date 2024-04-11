@@ -1,0 +1,24 @@
+spring:
+  config:
+    activate:
+      on-profile: postgresql-flyway-dev
+
+  logging:
+    level:
+      root: DEBUG
+      flyway: DEBUG
+      org.flywaydb: DEBUG
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/${DATABASE_NAME}
+    #username: ${DATABASE_USERNAME}
+    username: postgres
+    password: ${DATABASE_PASSWORD}
+
+  flyway:
+    locations: classpath:db/migration
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/${DATABASE_NAME}
+    #username: ${DATABASE_USERNAME}
+    username: postgres
+    password: ${DATABASE_PASSWORD}

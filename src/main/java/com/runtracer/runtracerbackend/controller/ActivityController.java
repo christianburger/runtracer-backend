@@ -34,15 +34,15 @@ public class ActivityController {
 
     @Operation(summary = "Get the version of the application")
     @GetMapping("/api/version")
-    public String getVersion() {
-        return applicationVersion;
+    public Mono<String> getVersion() {
+        return Mono.just(applicationVersion);
     }
 
     @Operation(summary = "Get the name of the application")
     @GetMapping("/api/appName")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public String getAppName() {
-        return applicationName;
+    public Mono<String> getAppName() {
+        return Mono.just(applicationName);
     }
 
     @Operation(summary = "Get an activity by its ID")
