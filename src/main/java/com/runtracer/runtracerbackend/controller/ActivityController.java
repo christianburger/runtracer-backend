@@ -33,13 +33,13 @@ public class ActivityController {
     private ActivityMapper activityMapper;
 
     @Operation(summary = "Get the version of the application")
-    @GetMapping("/api/version")
+    @GetMapping("/version")
     public Mono<String> getVersion() {
         return Mono.just(applicationVersion);
     }
 
     @Operation(summary = "Get the name of the application")
-    @GetMapping("/api/appName")
+    @GetMapping("/appName")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Mono<String> getAppName() {
         return Mono.just(applicationName);
