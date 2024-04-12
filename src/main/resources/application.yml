@@ -1,6 +1,7 @@
 application:
   name: runtracer-backend
   description: "Runtracer Backend API"
+  message: "This is a message from application.yml"
   version: 1.0.0
 
   admin:

@@ -4,6 +4,7 @@ import com.runtracer.runtracerbackend.controller.AuthenticationController;
 import com.runtracer.runtracerbackend.dto.UserDto;
 import com.runtracer.runtracerbackend.exceptions.InvalidCredentialsException;
 import com.runtracer.runtracerbackend.exceptions.UserNotFoundException;
+import com.runtracer.runtracerbackend.mappers.ApiUserResponseMapper;
 import com.runtracer.runtracerbackend.mappers.RoleMapper;
 import com.runtracer.runtracerbackend.mappers.UserMapper;
 import com.runtracer.runtracerbackend.mappers.UserRoleMapper;
@@ -13,16 +14,22 @@ import com.runtracer.runtracerbackend.repository.UserRepository;
 import com.runtracer.runtracerbackend.repository.UserRoleRepository;
 import com.runtracer.runtracerbackend.service.UserService;
 import com.runtracer.runtracerbackend.service.UserServiceImpl;
+import com.runtracer.runtracerbackend.utils.TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -59,11 +66,46 @@ public class AuthenticationTests {
 
     private AuthenticationController authenticationController;
 
+    private static Stream<UserDto> provideUsers() {
+        ApiUserResponseMapper apiUserResponseMapper = Mappers.getMapper(ApiUserResponseMapper.class);
+        TestUtils testUtils = new TestUtils(apiUserResponseMapper);
+        return Stream.of(
+                testUtils.createUserDto(),
+                testUtils.createUserDto(),
+                testUtils.createUserDto(),
+                testUtils.createUserDto(),
+                testUtils.createUserDto(),
+                testUtils.createUserDto(),
+                testUtils.createUserDto(),
+                testUtils.createUserDto(),
+                testUtils.createUserDto(),
+                testUtils.createUserDto()
+        );
+    }
+
     @BeforeEach
     public void setup() {
         passwordEncoder = new BCryptPasswordEncoder();
         userService = new UserServiceImpl(userRepository, roleRepository, userRoleRepository, userMapper, roleMapper, userRoleMapper, passwordEncoder);
         authenticationController = new AuthenticationController(userService, passwordEncoder, null);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideUsers")
+    void authenticateFromDto_ValidCredentials(UserDto userDto) {
+        when(userMapper.toDto(any(User.class))).thenAnswer(i -> userDto);
+
+        User user = new User();
+        user.setUsername(userDto.getUsername());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+
+        when(userRepository.findByUsername(userDto.getUsername())).thenReturn(Mono.just(user));
+
+        Mono<UserDto> result = userService.authenticateFromDto(userDto);
+
+        StepVerifier.create(result)
+                .expectNextMatches(returnedUserDto -> returnedUserDto.getUsername().equals(userDto.getUsername()))
+                .verifyComplete();
     }
 
     @Test
@@ -100,6 +142,7 @@ public class AuthenticationTests {
         assertEquals("Login successful", response);
         log.info("Assertion passed: response equals 'Login successful'");
     }
+
 
     @Test
     public void loginWithNonExistentUser() {

@@ -1,41 +1,61 @@
 package com.runtracer.runtracerbackend.utils;
 
 import com.runtracer.runtracerbackend.dto.*;
-import com.runtracer.runtracerbackend.model.Role.RoleType;
+import com.runtracer.runtracerbackend.dtos.ApiRoleDto;
+import com.runtracer.runtracerbackend.mappers.ApiUserResponseMapper;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
+@Setter
+@Getter
+@Component
 public class TestUtils {
     private static final ApiClient API_CLIENT = new ApiClient();
+    private final ApiUserResponseMapper apiUserResponseMapper;
 
-    public static UserDto createUserDto() {
+    public TestUtils(ApiUserResponseMapper apiUserResponseMapper) {
+        this.apiUserResponseMapper = apiUserResponseMapper;
+    }
+
+    public UserDto createUserDto() {
+        log.info("createUserDto called");
         UserDto userDto = new UserDto();
         try {
+            log.info("Calling API_CLIENT.getUserData()");
             ApiUserResponse apiUserResponse = API_CLIENT.getUserData();
+            log.info("API_CLIENT.getUserData() returned: {}", apiUserResponse);
             ApiUserResponse.UserDto apiUserDto = apiUserResponse.getResults().get(0);
+            log.info("apiUserDto: {}", apiUserDto);
 
-            userDto.setUserId(UUID.fromString(apiUserDto.getId().toString()));
-            userDto.setUsername(apiUserDto.getUsername());
-            userDto.setPassword(apiUserDto.getPassword());
-            userDto.setEmail(apiUserDto.getEmail());
+            // Generate a random UUID and set it as the userId of the apiUserDto
+            UUID randomUUID = UUID.randomUUID();
+            apiUserDto.setUserId(randomUUID.toString());
 
-            RoleDto roleDto = new RoleDto();
-            roleDto.setRoleId(UUID.randomUUID());
-            roleDto.setName(apiUserDto.getRoles().contains("admin") ? RoleType.ROLE_ADMIN : RoleType.ROLE_USER);
+            // Generate a random UUID for each role in the roles list
+            for (ApiRoleDto role : apiUserDto.getRoles()) {
+                UUID randomRoleUUID = UUID.randomUUID();
+                role.setRoleId(randomRoleUUID.toString());
+            }
 
-            userDto.setRoles(Collections.singletonList(roleDto));
-            log.info("UserDto: {}", userDto);
+            userDto = apiUserResponseMapper.toUserDto(apiUserDto);
+            userDto.setUserId(randomUUID);
+            log.info("Mapped apiUserDto to userDto: {}", userDto);
+
         } catch (Exception e) {
             log.error("Error creating UserDto from API data", e);
         }
+        log.info("createUserDto returning: {}", userDto);
         return userDto;
     }
 
-    public static ActivityDto createActivityDto(UUID id) {
+
+    public ActivityDto createActivityDto(UUID id) {
         ActivityDto activityDto = new ActivityDto();
         activityDto.setActivityId(id);
         activityDto.setUserId(id);
@@ -47,7 +67,7 @@ public class TestUtils {
         return activityDto;
     }
 
-    public static PositionDataDto createPositionDataDto(UUID id) {
+    public PositionDataDto createPositionDataDto(UUID id) {
         PositionDataDto positionDataDto = new PositionDataDto();
         positionDataDto.setActivityId(id);
         positionDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
@@ -58,7 +78,7 @@ public class TestUtils {
         return positionDataDto;
     }
 
-    public static HeartbeatDataDto createHeartbeatDataDto(UUID id) {
+    public HeartbeatDataDto createHeartbeatDataDto(UUID id) {
         HeartbeatDataDto heartbeatDataDto = new HeartbeatDataDto();
         heartbeatDataDto.setActivityId(id);
         heartbeatDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
@@ -67,7 +87,7 @@ public class TestUtils {
         return heartbeatDataDto;
     }
 
-    public static MovementDataDto createMovementDataDto(UUID id) {
+    public MovementDataDto createMovementDataDto(UUID id) {
         MovementDataDto movementDataDto = new MovementDataDto();
         movementDataDto.setActivityId(id);
         movementDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
@@ -79,7 +99,7 @@ public class TestUtils {
         return movementDataDto;
     }
 
-    public static StepDataDto createStepDataDto(UUID id) {
+    public StepDataDto createStepDataDto(UUID id) {
         StepDataDto stepDataDto = new StepDataDto();
         stepDataDto.setActivityId(id);
         stepDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
@@ -88,3 +108,27 @@ public class TestUtils {
         return stepDataDto;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

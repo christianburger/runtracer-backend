@@ -11,14 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.test.context.ActiveProfiles;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -27,12 +26,10 @@ import java.time.Duration;
 
 @Configuration
 @Slf4j
-@Profile("postgresql-flyway-dev")
-public class SynchronousDatabaseConfigPostgresql {
+@ActiveProfiles("test")
+public class FlywayTestConfiguration {
 
-    @Value("${spring.r2dbc.url}")
-    private String r2dbc_url;
-
+/*
     @Value("${spring.flyway.url}")
     private String flywayUrl;
 
@@ -42,31 +39,46 @@ public class SynchronousDatabaseConfigPostgresql {
     @Value("${spring.flyway.password}")
     private String password;
 
+    @Value("${spring.application.username}")
+    private String adminUser;
+
+    @Value("${application.email}")
+    private String email;
+
     @Value("${server.port}")
     private String serverPort;
 
-    @Value("${application.message}")
+    @Value("${server.message}")
     private String serverMessage;
+
+    @Value("${spring.flyway.url}")
+    private String flywayUrl;
+
+    @Value("${spring.flyway.username}")
+    private String username;
+
+    @Value("${spring.flyway.password}")
+    private String password;
+     */
+
+    private String flywayUrl = "jdbc:postgresql://localhost:5432/runtracer-test";
+    private String username = "postgres";
+    private String password = "password";
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     @Bean
     public DataSource dataSource() {
-        log.info("DataSource datasource: serverPort: {}", serverPort);
-        log.info("DataSource datasource: serverMessage: {}", serverMessage);
+        log.info("Value of flywayUrl: {}", flywayUrl);
+        log.info("Value of : {}", username);
+        log.info("Value of : {}", password);
         log.info("Creating DataSource with URL: {}, username: {}, password: {}", flywayUrl, username, password);
         PGSimpleDataSource dataSource = DataSourceBuilder.create().type(PGSimpleDataSource.class).url(flywayUrl).username(username).password(password).build();
-
         log.info("DataSource created: {}", dataSource);
-
-        // Publish DatabaseConfiguredEvent after DataSource is created
         eventPublisher.publishEvent(new DatabaseConfiguredEvent(this));
         log.info("DatabaseConfiguredEvent published");
-
-        // Test and print connection details
         testConnection(dataSource);
-
         return dataSource;
     }
 
@@ -83,7 +95,7 @@ public class SynchronousDatabaseConfigPostgresql {
         return flyway;
     }
 
-    private void testConnection(DataSource dataSource) {
+    public void testConnection(DataSource dataSource) {
         log.info("Testing connection with DataSource: {}", dataSource);
         try (Connection connection = dataSource.getConnection()) {
             if (connection != null && !connection.isClosed()) {
@@ -123,6 +135,7 @@ public class SynchronousDatabaseConfigPostgresql {
     private ConnectionFactoryOptions configureConnectionFactoryOptions() {
         log.info("Entering configureConnectionFactoryOptions() method");
 
+        String r2dbc_url = "r2dbc:postgresql://localhost:5432/runtracer-test";
         ConnectionFactoryOptions options = ConnectionFactoryOptions.parse(r2dbc_url)
                 .mutate()
                 .option(ConnectionFactoryOptions.USER, username)

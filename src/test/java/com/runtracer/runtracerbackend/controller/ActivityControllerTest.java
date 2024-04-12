@@ -1,6 +1,7 @@
 package com.runtracer.runtracerbackend.controller;
 
 import com.runtracer.runtracerbackend.dto.ActivityDto;
+import com.runtracer.runtracerbackend.mappers.ActivityMapper;
 import com.runtracer.runtracerbackend.model.activity.Activity;
 import com.runtracer.runtracerbackend.service.ActivityService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,25 +31,27 @@ public class ActivityControllerTest {
     @MockBean
     private ActivityService activityService;
 
-/*    @Test
+    @MockBean
+    private ActivityMapper activityMapper;
+
+    @Test
     @WithMockUser
     public void testGetActivity() {
-        UUID id = UUID.randomUUID();
-        Activity activity = new Activity();
-        activity.setId(id);
-
-        log.info("UUID id = " +  id);
+        UUID activityId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID(); // replace with actual user ID
+        Activity activity = new Activity(activityId, userId);
 
         ActivityDto expectedActivityDto = new ActivityDto();
-        expectedActivityDto.setId(id);
+        expectedActivityDto.setActivityId(activityId);
 
-        Mockito.when(activityService.findById(id)).thenAnswer(invocation -> Mono.just(activity));
+        Mockito.when(activityService.findById(activityId)).thenReturn(Mono.just(activity));
+        Mockito.when(activityMapper.toDto(activity)).thenReturn(expectedActivityDto);
 
         webTestClient.get()
-                .uri("/api/activities/{id}", id)
+                .uri("/api/activities/{id}", activityId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ActivityDto.class)
                 .isEqualTo(expectedActivityDto);
-    }*/
+    }
 }

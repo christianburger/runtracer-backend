@@ -1,6 +1,6 @@
 spring:
   application:
-    name: runtracer-backend-prod
+    name: runtracer-backend-test
 
     logging:
     level:
@@ -9,8 +9,16 @@ spring:
   server:
     port: ${SERVER_PORT}}
 
-  r2dbc:
-    url: r2dbc:mariadb://localhost:3306/${DATABASE_NAME}
+  flyway:
+    locations: classpath:db/migration
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/${DATABASE_NAME}
+    #username: ${DATABASE_USERNAME}
+    username: postgres
+    password: ${DATABASE_PASSWORD}
 
-    username: ${DATABASE_USERNAME}
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/${DATABASE_NAME}
+    #username: ${DATABASE_USERNAME}
+    username: postgres
     password: ${DATABASE_PASSWORD}

@@ -31,18 +31,30 @@ public class ActivityControllerEndToEndTest {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private TestUtils testUtils;
+
     @Test
     public void testEndToEndUserFlow() {
-        // Create a new user
-        UserDto newUserDto = TestUtils.createUserDto();
+        UserDto newUserDto = createNewUser();
+        UserDto savedUserDto = saveUser(newUserDto);
+        UserDto userFromController = retrieveUser(savedUserDto);
+        assertUsersAreEqual(savedUserDto, userFromController);
+    }
 
-        // Save the new user through the controller
-        UserDto savedUserDto = userController.createUser(newUserDto).block();
+    private UserDto createNewUser() {
+        return testUtils.createUserDto();
+    }
 
-        // Retrieve the user from the controller
-        UserDto userFromController = userController.getUser(savedUserDto.getUserId()).block();
+    private UserDto saveUser(UserDto userDto) {
+        return userController.createUser(userDto).block();
+    }
 
-        // Assert that the user saved and the user retrieved from the controller are the same
-        assertEquals(savedUserDto, userFromController);
+    private UserDto retrieveUser(UserDto userDto) {
+        return userController.getUser(userDto.getUserId()).block();
+    }
+
+    private void assertUsersAreEqual(UserDto userDto1, UserDto userDto2) {
+        assertEquals(userDto1, userDto2);
     }
 }
