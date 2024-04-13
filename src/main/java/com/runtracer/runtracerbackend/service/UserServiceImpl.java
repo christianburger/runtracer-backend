@@ -120,15 +120,24 @@ public class UserServiceImpl implements UserService {
                         return userRepository.save(user)
                                 .flatMap(savedUser -> {
                                     log.info("Saved User: {}", savedUser);
-                                    Role role = savedUser.getRoles().get(0);
-                                    return saveRole(role)
-                                            .flatMap(savedRole -> {
-                                                UserRole userRole = new UserRole();
-                                                userRole.setUserId(savedUser.getUserId());
-                                                userRole.setRoleId(savedRole.getRoleId());
-                                                return saveUserRole(userRole)
-                                                        .thenReturn(savedUser);
-                                            });
+                                    if (savedUser.getRoles() != null && !savedUser.getRoles().isEmpty()) {
+                                        Role role = savedUser.getRoles().get(0);
+                                        return saveRole(role)
+                                                .flatMap(savedRole -> {
+                                                    UserRole userRole = new UserRole();
+                                                    userRole.setUserId(savedUser.getUserId());
+                                                    userRole.setRoleId(savedRole.getRoleId());
+                                                    return saveUserRole(userRole)
+                                                            .then(userRoleRepository.findByUserId(savedUser.getUserId())
+                                                                    .flatMap(userRole1 -> roleRepository.findById(userRole1.getRoleId()))
+                                                                    .collectList()
+                                                                    .doOnNext(savedUser::setRoles)
+                                                                    .thenReturn(savedUser));
+                                                });
+                                    } else {
+                                        log.error("No roles found for the user: {}", savedUser);
+                                        return Mono.just(savedUser);
+                                    }
                                 });
                     }
                 })

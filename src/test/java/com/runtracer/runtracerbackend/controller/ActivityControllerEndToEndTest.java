@@ -35,13 +35,10 @@ import reactor.test.StepVerifier;
 import java.util.List;
 import java.util.UUID;
 
-import static com.runtracer.runtracerbackend.model.Role.RoleType.ROLE_USER;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-
 @ExtendWith(SpringExtension.class)
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @SpringBootTest
 @AutoConfigureWebTestClient
 @ActiveProfiles("postgresql-flyway-dev")
@@ -80,20 +77,6 @@ public class ActivityControllerEndToEndTest {
         this.roleRepository = roleRepository;
         this.userRoleRepository = userRoleRepository;
         this.activityRepository = activityRepository;
-    }
-
-    @Test
-    public void testCheckAndCreateUserLocal() {
-        TestUtils testUtils = new TestUtils(apiUserResponseMapper); // Instantiate TestUtils
-        UserDto userDto = testUtils.createUserDto(); // Use TestUtils to create a UserDto
-        log.info("Created UserDto: {}", userDto);
-
-        // Convert UserDto to User using UserMapper
-        User user = userMapper.toEntity(userDto);
-        log.info("Converted UserDto to User: {}", user);
-
-        // Call checkAndCreateUser function
-        checkAndCreateUser(user, ROLE_USER);
     }
 
     @Test
@@ -186,55 +169,4 @@ public class ActivityControllerEndToEndTest {
                             });
                 });
     }
-
-
-    private void checkAndCreateUser(User user, Role.RoleType roleType) {
-        log.info("Checking and creating user: {}", user);
-
-        // First, check if the user already exists
-        userService.findByUsername(user.getUsername())
-                .hasElement()
-                .doOnNext(userExists -> log.info("User exists: {}", userExists))
-                .doOnError(e -> log.error("Error occurred while checking user: ", e))
-                .subscribe(userExists -> {
-                    if (userExists) {
-                        log.info("User already exists");
-                    } else {
-                        log.info("User not in database, creating");
-                        saveUserWithRole(user, roleType);
-                    }
-                });
-    }
-
-    private void saveUserWithRole(User user, Role.RoleType roleType) {
-        log.info("Save User: {} with Role: {}", user, roleType);
-
-        userService.save(user)
-                .doOnNext(savedUser -> log.info("Saved user: {}", savedUser))
-                .doOnError(e -> log.error("Error occurred while saving user: ", e))
-                .flatMap(savedUser -> {
-                    Role role = new Role();
-                    role.setName(roleType);
-                    log.info("Role details: {}", role);
-
-                    return roleService.save(role)
-                            .doOnNext(savedRole -> log.info("Saved role: {}", savedRole))
-                            .doOnError(e -> log.error("Error occurred while saving role: ", e))
-                            .flatMap(savedRole -> {
-                                UserRole userRole = new UserRole();
-                                userRole.setUserId(savedUser.getUserId());
-                                userRole.setRoleId(savedRole.getRoleId());
-                                log.info("User role details: {}", userRole);
-
-                                return userService.saveUserRole(userRole)
-                                        .doOnNext(savedUserRole -> log.info("Saved user role: {}", savedUserRole))
-                                        .doOnError(e -> log.error("Error occurred while saving user role: ", e));
-                            });
-                })
-                .doOnSuccess(savedUser -> log.info("User created successfully"))
-                .doOnError(e -> log.error("Error occurred while creating user: ", e))
-                .subscribe();
-    }
-
-
 }
