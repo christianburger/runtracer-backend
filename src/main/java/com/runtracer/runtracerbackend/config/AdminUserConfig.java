@@ -6,6 +6,7 @@ import com.runtracer.runtracerbackend.model.UserRole;
 import com.runtracer.runtracerbackend.service.RoleService;
 import com.runtracer.runtracerbackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,7 @@ public class AdminUserConfig {
     @Value("${application.admin.email}")
     private String adminEmail;
 
+    @Autowired
     public AdminUserConfig(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.roleService = roleService;

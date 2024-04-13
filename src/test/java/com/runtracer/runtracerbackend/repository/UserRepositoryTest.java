@@ -1,51 +1,30 @@
 package com.runtracer.runtracerbackend.repository;
 
-import com.runtracer.runtracerbackend.config.FlywayTestConfiguration;
 import com.runtracer.runtracerbackend.dto.UserDto;
 import com.runtracer.runtracerbackend.mappers.ApiUserResponseMapper;
 import com.runtracer.runtracerbackend.model.User;
 import com.runtracer.runtracerbackend.utils.TestUtils;
-import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
-import javax.sql.DataSource;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@ComponentScan(basePackages = "com.runtracer.runtracerbackend.repository")
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("test")
-@ContextConfiguration(classes = {FlywayTestConfiguration.class})
-@Import(FlywayTestConfiguration.class)
-@SpringBootTest
+@ActiveProfiles("postgresql-flyway-dev")
 public class UserRepositoryTest {
 
+    private final ApiUserResponseMapper apiUserResponseMapper;
 
     @Autowired
-    private FlywayTestConfiguration flywayTestConfiguration;
-    @Autowired
-    private Flyway flyway;
-
-    private ApiUserResponseMapper apiUserResponseMapper;
-
-    @Autowired
-    public UserRepositoryTest(FlywayTestConfiguration flywayTestConfiguration, Flyway flyway) {
-        this.flywayTestConfiguration = flywayTestConfiguration;
+    public UserRepositoryTest() {
         this.apiUserResponseMapper = Mappers.getMapper(ApiUserResponseMapper.class);
-        this.flyway = flyway;
     }
 
     private Stream<UserDto> provideUsers() {
@@ -67,10 +46,6 @@ public class UserRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        DataSource dataSource = flywayTestConfiguration.dataSource();
-        flywayTestConfiguration.testConnection(dataSource);
-        flyway.clean();
-        flyway.migrate();
     }
 
     @Test
@@ -88,7 +63,7 @@ public class UserRepositoryTest {
     }
 
 ///*    @Test
-//    public void testCreateAndPersistAndFindUserDtoInRepository() {
+//    public void testCreateAndPersistAndFindUserInRepository() {
 //        // Arrange
 //        TestUtils testUtils = new TestUtils(apiUserResponseMapper);
 //        UserDto userDto = testUtils.createUserDto();

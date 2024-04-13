@@ -23,12 +23,12 @@ services:
     ports:
       - "5432:5432"
 
-  h2:
-    image: oscarfonts/h2
-    volumes:
-      - ${H2_VOLUME_PATH}:/h2-data  # Use the H2_VOLUME_PATH environment variable
-    ports:
-      - "9092:9092"
-    environment:
-      H2_OPTIONS: -ifNotExists -web -webAllowOthers -tcp -tcpAllowOthers
+#  h2:
+#    image: oscarfonts/h2
+#    volumes:
+#      - ${H2_VOLUME_PATH}:/h2-data  # Use the H2_VOLUME_PATH environment variable
+#    ports:
+#      - "9092:9092"
+#    environment:
+#      H2_OPTIONS: -ifNotExists -web -webAllowOthers -tcp -tcpAllowOthers
 

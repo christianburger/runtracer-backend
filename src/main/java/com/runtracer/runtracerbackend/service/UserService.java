@@ -1,6 +1,7 @@
 package com.runtracer.runtracerbackend.service;
 
 import com.runtracer.runtracerbackend.dto.UserDto;
+import com.runtracer.runtracerbackend.model.Role;
 import com.runtracer.runtracerbackend.model.User;
 import com.runtracer.runtracerbackend.model.UserRole;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -18,6 +19,8 @@ public interface UserService extends ReactiveUserDetailsService {
     Mono<UserDto> updateDto(UUID id, UserDto userDto);
     Mono<Void> deleteByIdDto(UUID id);
     Mono<User> save(User user);
+    Mono<Role> saveRole(Role role);
     Mono<UserRole> saveUserRole(UserRole userRole);
     Mono<UserDetails> findByUsername(String username);
+    Mono<User> findByUsernameUser(String username);
 }

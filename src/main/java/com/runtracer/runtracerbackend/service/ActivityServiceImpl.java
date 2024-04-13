@@ -5,6 +5,7 @@ import com.runtracer.runtracerbackend.mappers.*;
 import com.runtracer.runtracerbackend.model.activity.Activity;
 import com.runtracer.runtracerbackend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
