@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime; // Imported LocalDateTime
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +56,12 @@ public class User implements UserDetails {
 
     @Column("image_url")
     private String imageUrl;
+
+    @Column("created_at")
+    private LocalDateTime createdAt; // Added timestamp for creation
+
+    @Column("updated_at")
+    private LocalDateTime updatedAt; // Added timestamp for updates
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

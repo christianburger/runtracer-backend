@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime; // Imported LocalDateTime
 import java.util.UUID;
 
 @Data
@@ -19,7 +20,7 @@ public class MovementData {
     @Id
     private UUID movementDataId;
     @Column("timestamp")
-    private Long timestamp;
+    private LocalDateTime timestamp; // Changed from Long to LocalDateTime
     @Column("move_up")
     private Integer moveUp;
     @Column("move_down")

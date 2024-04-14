@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,6 +64,11 @@ public class TestUtils {
         activityDto.setHeartbeatData(createHeartbeatDataDto(id, numElements));
         activityDto.setMovementData(createMovementDataDto(id, numElements));
         activityDto.setStepData(createStepDataDto(id, numElements));
+
+        // Set the startTime and endTime
+        activityDto.setStartTime(LocalDateTime.now());
+        activityDto.setEndTime(LocalDateTime.now().plusHours(1));  // Assuming the activity lasts for 1 hour
+
         log.info("ActivityDto: {}", activityDto);
         return activityDto;
     }
@@ -72,9 +78,9 @@ public class TestUtils {
         for (int i = 0; i < numElements; i++) {
             PositionDataDto positionDataDto = new PositionDataDto();
             positionDataDto.setActivityId(id);
-            positionDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
-            positionDataDto.setLatitude((long) (id.getLeastSignificantBits() % 180 - 90)); // latitude range -90 to 90
-            positionDataDto.setLongitude((long) (id.getLeastSignificantBits() % 360 - 180)); // longitude range -180 to 180
+            positionDataDto.setTimestamp(LocalDateTime.now()); // Changed from Long to LocalDateTime
+            positionDataDto.setLatitude((double) (id.getLeastSignificantBits() % 180 - 90)); // Changed from Long to Double
+            positionDataDto.setLongitude((double) (id.getLeastSignificantBits() % 360 - 180)); // Changed from Long to Double
             positionDataDto.setHeight((int) (id.getLeastSignificantBits() % 100)); // assuming height range 0-100
             log.info("PositionDataDto: {}", positionDataDto);
             positionDataDtoList.add(positionDataDto);
@@ -87,7 +93,7 @@ public class TestUtils {
         for (int i = 0; i < numElements; i++) {
             HeartbeatDataDto heartbeatDataDto = new HeartbeatDataDto();
             heartbeatDataDto.setActivityId(id);
-            heartbeatDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
+            heartbeatDataDto.setTimestamp(LocalDateTime.now()); // Changed from Long to LocalDateTime
             heartbeatDataDto.setHeartbeat((int) (id.getLeastSignificantBits() % 200)); // assuming heartbeat range 0-200
             log.info("HeartbeatDataDto: {}", heartbeatDataDto);
             heartbeatDataDtoList.add(heartbeatDataDto);
@@ -100,7 +106,7 @@ public class TestUtils {
         for (int i = 0; i < numElements; i++) {
             MovementDataDto movementDataDto = new MovementDataDto();
             movementDataDto.setActivityId(id);
-            movementDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
+            movementDataDto.setTimestamp(LocalDateTime.now()); // Changed from Long to LocalDateTime
             movementDataDto.setMoveUp((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
             movementDataDto.setMoveDown((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
             movementDataDto.setMoveLeft((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
@@ -116,7 +122,7 @@ public class TestUtils {
         for (int i = 0; i < numElements; i++) {
             StepDataDto stepDataDto = new StepDataDto();
             stepDataDto.setActivityId(id);
-            stepDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
+            stepDataDto.setTimestamp(LocalDateTime.now()); // Changed from Long to LocalDateTime
             stepDataDto.setSteps((int) (id.getLeastSignificantBits() % 10000)); // assuming steps range 0-10000
             log.info("StepDataDto: {}", stepDataDto);
             stepDataDtoList.add(stepDataDto);

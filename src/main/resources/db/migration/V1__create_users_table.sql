@@ -10,5 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   account_non_locked BOOLEAN NOT NULL,
   credentials_non_expired BOOLEAN NOT NULL,
   google_id VARCHAR(255),
-  image_url VARCHAR(255)
+  image_url VARCHAR(255),
+  created_at TIMESTAMP, -- Added timestamp for creation
+  updated_at TIMESTAMP  -- Added timestamp for updates
 );

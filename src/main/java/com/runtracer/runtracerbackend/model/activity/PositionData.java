@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime; // Imported LocalDateTime
 import java.util.UUID;
 
 @Data
@@ -19,11 +20,11 @@ public class PositionData {
     @Id
     private UUID positionDataId;
     @Column("timestamp")
-    private Long timestamp;
+    private LocalDateTime timestamp; // Changed from Long to LocalDateTime
     @Column("latitude")
-    private Long latitude;
+    private Double latitude; // Changed from Long to Double
     @Column("longitude")
-    private Long longitude;
+    private Double longitude; // Changed from Long to Double
     @Column("height")
     private Integer height;
     @Column("activity_id")

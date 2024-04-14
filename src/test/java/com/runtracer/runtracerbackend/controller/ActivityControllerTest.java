@@ -18,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
@@ -41,8 +42,11 @@ public class ActivityControllerTest {
     public void testGetActivity() {
         UUID activityId = UUID.randomUUID();
         UUID userId = UUID.randomUUID(); // replace with actual user ID
-        Activity activity = new Activity(activityId, userId);
+        // Assuming you have startTime and endTime available
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = LocalDateTime.now().plusHours(1); // Example value
 
+        Activity activity = new Activity(activityId, userId, null, startTime, endTime);
         ActivityDto expectedActivityDto = new ActivityDto();
         expectedActivityDto.setActivityId(activityId);
 

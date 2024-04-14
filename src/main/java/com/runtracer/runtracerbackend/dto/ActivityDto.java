@@ -2,6 +2,7 @@ package com.runtracer.runtracerbackend.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime; // Imported LocalDateTime
 import java.util.List;
 import java.util.UUID;
 
@@ -13,4 +14,6 @@ public class ActivityDto {
     private List<HeartbeatDataDto> heartbeatData;
     private List<MovementDataDto> movementData;
     private List<StepDataDto> stepData;
+    private LocalDateTime startTime; // Added startTime field with LocalDateTime type
+    private LocalDateTime endTime; // Added endTime field with LocalDateTime type
 }

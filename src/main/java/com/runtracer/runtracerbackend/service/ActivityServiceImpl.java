@@ -63,10 +63,24 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public Mono<ActivityDto> saveDto(ActivityDto activityDto) {
-
         log.info("Starting saveDto with activityDto: {}", activityDto);
 
+        // Map the ActivityDto to Activity entity
         Activity activity = activityMapper.toEntity(activityDto);
+
+        // Log all parameters of the activityDto
+        log.info("ActivityDto parameters: activityId={}, userId={}, startTime={}, endTime={}",
+                activityDto.getActivityId(), activityDto.getUserId(), activityDto.getStartTime(), activityDto.getEndTime());
+
+        // Set startTime and endTime if available
+        if (activityDto.getStartTime() != null) {
+            activity.setStartTime(activityDto.getStartTime());
+            log.info("Start time: {}", activity.getStartTime());  // Print start time
+        }
+        if (activityDto.getEndTime() != null) {
+            activity.setEndTime(activityDto.getEndTime());
+            log.info("End time: {}", activity.getEndTime());  // Print end time
+        }
 
         log.info("Mapped activityDto to activity: {}", activity);
 
@@ -93,6 +107,7 @@ public class ActivityServiceImpl implements ActivityService {
                     }));
         }
     }
+
 
     private Mono<ActivityDto> saveActivityAndRelatedEntities(Activity activity, ActivityDto activityDto) {
         log.info("Starting saveActivityAndRelatedEntities with activity: {} and activityDto: {}", activity, activityDto);
