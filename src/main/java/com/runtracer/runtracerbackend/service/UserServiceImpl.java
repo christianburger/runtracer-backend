@@ -157,7 +157,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .map(user -> (UserDetails) user);
+                .flatMap(user -> userRoleRepository.findByUserId(user.getUserId())
+                        .flatMap(userRole -> roleRepository.findById(userRole.getRoleId()))
+                        .collectList()
+                        .doOnNext(user::setRoles)
+                        .thenReturn(user))
+                .cast(UserDetails.class);
     }
 
     @Override
@@ -172,7 +177,10 @@ public class UserServiceImpl implements UserService {
                         .flatMap(userRoles -> Flux.fromIterable(userRoles)
                                 .flatMap(userRole -> roleRepository.findById(userRole.getRoleId()))
                                 .collectList()
-                                .doOnNext(roles -> log.info("Roles found: {}", roles))
+                                .doOnNext(roles -> {
+                                    log.info("Roles found: {}", roles);
+                                    roles.forEach(role -> log.info("Role: {}", role.getName()));  // Log each role
+                                })
                                 .map(roles -> {
                                     user.setRoles(roles);
                                     return user;

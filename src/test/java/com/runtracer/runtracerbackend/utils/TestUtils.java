@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,59 +55,75 @@ public class TestUtils {
         return userDto;
     }
 
-
-    public ActivityDto createActivityDto(UUID id) {
+    public ActivityDto createActivityDto(UUID id, int numElements) {
         ActivityDto activityDto = new ActivityDto();
         activityDto.setActivityId(id);
         activityDto.setUserId(id);
-        activityDto.setPositionData(List.of(createPositionDataDto(id)));
-        activityDto.setHeartbeatData(List.of(createHeartbeatDataDto(id)));
-        activityDto.setMovementData(List.of(createMovementDataDto(id)));
-        activityDto.setStepData(List.of(createStepDataDto(id)));
+        activityDto.setPositionData(createPositionDataDto(id, numElements));
+        activityDto.setHeartbeatData(createHeartbeatDataDto(id, numElements));
+        activityDto.setMovementData(createMovementDataDto(id, numElements));
+        activityDto.setStepData(createStepDataDto(id, numElements));
         log.info("ActivityDto: {}", activityDto);
         return activityDto;
     }
 
-    public PositionDataDto createPositionDataDto(UUID id) {
-        PositionDataDto positionDataDto = new PositionDataDto();
-        positionDataDto.setActivityId(id);
-        positionDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
-        positionDataDto.setLatitude((long) (id.getLeastSignificantBits() % 180 - 90)); // latitude range -90 to 90
-        positionDataDto.setLongitude((long) (id.getLeastSignificantBits() % 360 - 180)); // longitude range -180 to 180
-        positionDataDto.setHeight((int) (id.getLeastSignificantBits() % 100)); // assuming height range 0-100
-        log.info("PositionDataDto: {}", positionDataDto);
-        return positionDataDto;
+    public List<PositionDataDto> createPositionDataDto(UUID id, int numElements) {
+        List<PositionDataDto> positionDataDtoList = new ArrayList<>();
+        for (int i = 0; i < numElements; i++) {
+            PositionDataDto positionDataDto = new PositionDataDto();
+            positionDataDto.setActivityId(id);
+            positionDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
+            positionDataDto.setLatitude((long) (id.getLeastSignificantBits() % 180 - 90)); // latitude range -90 to 90
+            positionDataDto.setLongitude((long) (id.getLeastSignificantBits() % 360 - 180)); // longitude range -180 to 180
+            positionDataDto.setHeight((int) (id.getLeastSignificantBits() % 100)); // assuming height range 0-100
+            log.info("PositionDataDto: {}", positionDataDto);
+            positionDataDtoList.add(positionDataDto);
+        }
+        return positionDataDtoList;
     }
 
-    public HeartbeatDataDto createHeartbeatDataDto(UUID id) {
-        HeartbeatDataDto heartbeatDataDto = new HeartbeatDataDto();
-        heartbeatDataDto.setActivityId(id);
-        heartbeatDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
-        heartbeatDataDto.setHeartbeat((int) (id.getLeastSignificantBits() % 200)); // assuming heartbeat range 0-200
-        log.info("HeartbeatDataDto: {}", heartbeatDataDto);
-        return heartbeatDataDto;
+    public List<HeartbeatDataDto> createHeartbeatDataDto(UUID id, int numElements) {
+        List<HeartbeatDataDto> heartbeatDataDtoList = new ArrayList<>();
+        for (int i = 0; i < numElements; i++) {
+            HeartbeatDataDto heartbeatDataDto = new HeartbeatDataDto();
+            heartbeatDataDto.setActivityId(id);
+            heartbeatDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
+            heartbeatDataDto.setHeartbeat((int) (id.getLeastSignificantBits() % 200)); // assuming heartbeat range 0-200
+            log.info("HeartbeatDataDto: {}", heartbeatDataDto);
+            heartbeatDataDtoList.add(heartbeatDataDto);
+        }
+        return heartbeatDataDtoList;
     }
 
-    public MovementDataDto createMovementDataDto(UUID id) {
-        MovementDataDto movementDataDto = new MovementDataDto();
-        movementDataDto.setActivityId(id);
-        movementDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
-        movementDataDto.setMoveUp((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
-        movementDataDto.setMoveDown((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
-        movementDataDto.setMoveLeft((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
-        movementDataDto.setMoveRight((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
-        log.info("MovementDataDto: {}", movementDataDto);
-        return movementDataDto;
+    public List<MovementDataDto> createMovementDataDto(UUID id, int numElements) {
+        List<MovementDataDto> movementDataDtoList = new ArrayList<>();
+        for (int i = 0; i < numElements; i++) {
+            MovementDataDto movementDataDto = new MovementDataDto();
+            movementDataDto.setActivityId(id);
+            movementDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
+            movementDataDto.setMoveUp((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
+            movementDataDto.setMoveDown((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
+            movementDataDto.setMoveLeft((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
+            movementDataDto.setMoveRight((int) (id.getLeastSignificantBits() % 100)); // assuming range 0-100
+            log.info("MovementDataDto: {}", movementDataDto);
+            movementDataDtoList.add(movementDataDto);
+        }
+        return movementDataDtoList;
     }
 
-    public StepDataDto createStepDataDto(UUID id) {
-        StepDataDto stepDataDto = new StepDataDto();
-        stepDataDto.setActivityId(id);
-        stepDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
-        stepDataDto.setSteps((int) (id.getLeastSignificantBits() % 10000)); // assuming steps range 0-10000
-        log.info("StepDataDto: {}", stepDataDto);
-        return stepDataDto;
+    public List<StepDataDto> createStepDataDto(UUID id, int numElements) {
+        List<StepDataDto> stepDataDtoList = new ArrayList<>();
+        for (int i = 0; i < numElements; i++) {
+            StepDataDto stepDataDto = new StepDataDto();
+            stepDataDto.setActivityId(id);
+            stepDataDto.setTimestamp(id.getMostSignificantBits() & Long.MAX_VALUE);
+            stepDataDto.setSteps((int) (id.getLeastSignificantBits() % 10000)); // assuming steps range 0-10000
+            log.info("StepDataDto: {}", stepDataDto);
+            stepDataDtoList.add(stepDataDto);
+        }
+        return stepDataDtoList;
     }
+
 }
 
 

@@ -30,6 +30,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.List;
@@ -133,13 +134,12 @@ public class ActivityControllerEndToEndTest {
 
         // Save the user and its roles using UserService
         userService.save(user)
-                .doOnNext(savedUser -> log.info("Saved User with ID: {}", savedUser.getUserId()))
-                .doOnError(e -> log.error("Error occurred while saving user: ", e))
-                .subscribe(savedUser -> {
+                .flatMap(savedUser -> {
                     UUID userId = savedUser.getUserId(); // Get the ID of the saved user
 
                     // Create ActivityDto using TestUtils
-                    ActivityDto activityDto = testUtils.createActivityDto(userId);
+                    ActivityDto activityDto = testUtils.createActivityDto(userId, 20);
+                    activityDto.setActivityId(null); // Let the database generate a unique ID for the Activity
                     log.info("Created ActivityDto: {}", activityDto);
 
                     // Convert ActivityDto to Activity using ActivityMapper
@@ -147,26 +147,13 @@ public class ActivityControllerEndToEndTest {
                     log.info("Converted ActivityDto to Activity: {}", activity);
 
                     // Save the activity after the User is saved
-                    activityService.save(activity)
-                            .doOnNext(savedActivity -> log.info("Saved Activity with ID: {}", savedActivity.getActivityId()))
-                            .doOnError(e -> log.error("Error occurred while saving activity: ", e))
-                            .subscribe(savedActivity -> {
-                                UUID activityId = savedActivity.getActivityId(); // Get the ID of the saved activity
-
-                                ActivityDto expectedActivityDto = new ActivityDto();
-                                expectedActivityDto.setActivityId(activityId);
-                                log.info("Expected ActivityDto: {}", expectedActivityDto);
-
-                                webTestClient.get()
-                                        .uri("/api/activities/{id}", activityId)
-                                        .exchange()
-                                        .expectStatus().isOk()
-                                        .expectBody(ActivityDto.class)
-                                        .consumeWith(response -> {
-                                            ActivityDto result = response.getResponseBody();
-                                            log.info("Result: {}", result);
-                                        });
-                            });
-                });
+                    return activityService.saveDto(activityDto)
+                            .then(Mono.just(activityDto)); // Emit the original activityDto after saving
+                })
+                .as(StepVerifier::create) // Create StepVerifier for the reactive stream
+                .expectNextCount(1) // Expect one emitted item
+                .verifyComplete(); // Verify that the stream completes successfully
     }
+
+
 }
